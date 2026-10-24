@@ -51,7 +51,7 @@ void manualKeyDown(char c) {
     uint8_t j;
     int8_t dir;
     if (jointForKey(c, j, dir)) {
-        jog[j].dir = dir;
+        jog[j].cmd = dir;
         return;
     }
     switch (c) {
@@ -83,7 +83,7 @@ void manualKeyUp(char c) {
     uint8_t j;
     int8_t dir;
     if (jointForKey(c, j, dir)) {
-        if (jog[j].dir == dir) jog[j].dir = 0;
+        if (jog[j].cmd == dir) jog[j].cmd = 0;
     } else if (c == '4' || c == '6') {
         rail.stop();
     }

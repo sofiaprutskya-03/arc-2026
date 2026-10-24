@@ -38,6 +38,6 @@ struct Calibration {
 struct Jog {
     float pos;
     float vel;
-    int8_t dir;
+    float cmd;
     bool active;
 };

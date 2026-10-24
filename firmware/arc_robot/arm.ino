@@ -57,7 +57,7 @@ uint32_t moveArmTo(ArmPose target, uint16_t degPerSec) {
     const int16_t goal[3] = {target.base, target.shoulder, target.elbow};
     float maxDelta = 0;
     for (uint8_t j = 0; j < 3; j++) {
-        jog[j].dir = 0;
+        jog[j].cmd = 0;
         jog[j].vel = 0;
         jog[j].active = false;
         maxDelta = max(maxDelta, fabsf(goal[j] - currentAngle(j)));
@@ -80,12 +80,12 @@ uint32_t moveClaw(bool close) {
 void jogTick(float dt) {
     for (uint8_t j = 0; j < J_COUNT; j++) {
         Jog &g = jog[j];
-        if (g.dir == 0 && g.vel == 0) {
+        if (g.cmd == 0 && g.vel == 0) {
             g.active = false;
             continue;
         }
         if (j == J_WRIST && (!HAS_WRIST_SERVO || cal.wristLevel)) {
-            g.dir = 0;
+            g.cmd = 0;
             g.vel = 0;
             continue;
         }
@@ -94,10 +94,10 @@ void jogTick(float dt) {
             g.pos = currentAngle(j);
             g.active = true;
         }
-        float targetVel = g.dir * (float)JOG_SPEED_DEG_S;
-        float room = g.dir > 0 ? JOINT_MAX[j] - g.pos : g.pos - JOINT_MIN[j];
+        float targetVel = constrain(g.cmd, -1.0f, 1.0f) * JOG_SPEED_DEG_S;
+        float room = targetVel > 0 ? JOINT_MAX[j] - g.pos : g.pos - JOINT_MIN[j];
         float vBrake = sqrtf(2.0f * JOG_ACCEL_DEG_S2 * max(room, 0.0f));
-        if (fabsf(targetVel) > vBrake) targetVel = g.dir * vBrake;
+        if (fabsf(targetVel) > vBrake) targetVel = copysignf(vBrake, targetVel);
 
         float dv = JOG_ACCEL_DEG_S2 * dt;
         if (g.vel < targetVel) g.vel = min(g.vel + dv, targetVel);
@@ -135,7 +135,7 @@ bool armBusy() {
 void stopArm() {
     stopAllServos();
     for (uint8_t j = 0; j < J_COUNT; j++) {
-        jog[j].dir = 0;
+        jog[j].cmd = 0;
         jog[j].vel = 0;
         jog[j].active = false;
     }
