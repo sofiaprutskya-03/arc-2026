@@ -52,7 +52,7 @@ void pollSerial() {
         if (c == '\r' || c == '\n' || c == ' ') continue;
         if (c == '?') {
             printHelp();
-        } else if (c == '+' || c == '-') {
+        } else if ((c == '+' || c == '-') && HAS_WRIST_SERVO) {
             int d = c == '+' ? 1 : -1;
             if (cal.wristLevel) {
                 cal.wristOffset += d;

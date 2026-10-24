@@ -105,9 +105,11 @@ void setup() {
     delay(250);
     servoClaw.attach(PIN_SERVO_CLAW, CLAW_OPEN, SERVO_US_0DEG, SERVO_US_180DEG);
     delay(250);
-    servoWrist.setPeriodHertz(50);
-    servoWrist.attach(PIN_SERVO_WRIST, SERVO_US_0DEG, SERVO_US_180DEG);
-    writeWrist(cal.wristLevel ? levelWristAngle() : 90);
+    if (HAS_WRIST_SERVO) {
+        servoWrist.setPeriodHertz(50);
+        servoWrist.attach(PIN_SERVO_WRIST, SERVO_US_0DEG, SERVO_US_180DEG);
+        writeWrist(cal.wristLevel ? levelWristAngle() : 90);
+    }
 
     servoBase.setMinMaxConstraint(BASE_MIN, BASE_MAX);
     servoShoulder.setMinMaxConstraint(SHOULDER_MIN, SHOULDER_MAX);

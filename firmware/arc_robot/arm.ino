@@ -13,7 +13,12 @@ float currentAngle(uint8_t j) {
     return (us - SERVO_US_0DEG) * 180.0f / (SERVO_US_180DEG - SERVO_US_0DEG);
 }
 
+bool wristLevelActive() {
+    return HAS_WRIST_SERVO && cal.wristLevel;
+}
+
 void writeWrist(float deg) {
+    if (!HAS_WRIST_SERVO) return;
     wristAngle = constrain(deg, (float)WRIST_MIN, (float)WRIST_MAX);
     int us = SERVO_US_0DEG + (int)(wristAngle * (SERVO_US_180DEG - SERVO_US_0DEG) / 180.0f + 0.5f);
     servoWrist.writeMicroseconds(us);
@@ -84,7 +89,7 @@ void jogTick(float dt) {
             g.active = false;
             continue;
         }
-        if (j == J_WRIST && cal.wristLevel) {
+        if (j == J_WRIST && (!HAS_WRIST_SERVO || cal.wristLevel)) {
             g.dir = 0;
             g.vel = 0;
             continue;
@@ -122,7 +127,7 @@ void servoTick() {
 
     jogTick(dt);
     updateAllServos();
-    if (cal.wristLevel) writeWrist(levelWristAngle());
+    if (wristLevelActive()) writeWrist(levelWristAngle());
 }
 
 bool armBusy() {

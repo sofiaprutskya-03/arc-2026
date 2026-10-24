@@ -66,6 +66,10 @@ void manualKeyDown(char c) {
         break;
     case 'C': printStatus(); break;
     case 'D':
+        if (!HAS_WRIST_SERVO) {
+            Serial.println(F("Серво зап'ястка немає: горизонт тримає механіка."));
+            break;
+        }
         cal.wristLevel = !cal.wristLevel;
         saveCal();
         Serial.println(cal.wristLevel ? F("Вирівнювання клешні: УВІМК.") : F("Вирівнювання клешні: ВИМК."));
