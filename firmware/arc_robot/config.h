@@ -18,14 +18,14 @@
 // Сервоприводи (сигнальний дріт, зазвичай жовтий/помаранчевий)
 // GPIO 14 і 15 видають ШІМ під час завантаження ESP32 -> серво на них смикались би
 #define PIN_SERVO_BASE     13
-#define PIN_SERVO_SHOULDER 26
+#define PIN_SERVO_SHOULDER 33
 #define PIN_SERVO_ELBOW    27
 #define PIN_SERVO_WRIST    14
 #define PIN_SERVO_CLAW     25
 
 // Клавіатура 4x4: 8 дротів зліва направо = рядки 1..4, потім стовпці 1..4
 #define KEYPAD_ROW_PINS {23, 22, 21, 4}
-#define KEYPAD_COL_PINS {33, 14, 15, 5}
+#define KEYPAD_COL_PINS {26, 14, 15, 5}
 
 // Кінцевик нуля рейки (замикає на GND). -1 = кінцевика немає, нуль задається вручну.
 // Якщо є: GPIO 34 + зовнішній резистор 10 кОм до 3.3 В.
