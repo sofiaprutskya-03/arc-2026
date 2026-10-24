@@ -53,6 +53,7 @@ void abortJob(const char *reason) {
     rail.stop();
     stopArm();
     mode = MODE_MANUAL;
+    joyNeedsCenter = true;
     Serial.printf("ЗУПИНЕНО на кроці %u (%s): %s. Ручний режим.\n", stepIndex + 1,
                   stepIndex < stepCount ? steps[stepIndex].name : "-", reason);
 }

@@ -66,6 +66,13 @@ uint32_t stepStartMs = 0, stepTimeoutMs = 0;
 
 uint32_t homingStartMs = 0;
 
+JoyAxis joyX = {PIN_JOY_X, JOY_INVERT_X, 2048, 0, false};
+JoyAxis joyY = {PIN_JOY_Y, JOY_INVERT_Y, 2048, 0, false};
+bool joystickOk = false;
+bool joyNeedsCenter = true;
+int8_t joyRailDir = 0;
+float joyRailSpeed = 0;
+
 void setup() {
     Serial.setTxBufferSize(1024);
     Serial.begin(SERIAL_BAUD);
@@ -109,6 +116,7 @@ void setup() {
 
     keypad.setDebounceTime(20);
     keypad.setHoldTime(ZERO_HOLD_MS);
+    setupJoystick();
 
     printHelp();
     printStatus();
@@ -119,6 +127,8 @@ void loop() {
     pollKeypad();
     rail.run();
     pollSerial();
+    rail.run();
+    joystickTick();
     rail.run();
     servoTick();
     rail.run();

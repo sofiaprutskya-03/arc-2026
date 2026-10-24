@@ -41,3 +41,11 @@ struct Jog {
     float cmd;
     bool active;
 };
+
+struct JoyAxis {
+    uint8_t pin;
+    bool invert;
+    int center;
+    float filtered;
+    bool engaged;
+};
