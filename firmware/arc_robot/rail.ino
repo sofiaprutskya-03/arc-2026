@@ -18,6 +18,7 @@ void saveRailState(bool moving) {
 
 void railMoveTo(int32_t target, float speed) {
     target = constrain(target, railMinSteps(), railMaxSteps());
+    if (!rail.isRunning() && target == rail.currentPosition()) return;
     if (!railPowered) {
         rail.enableOutputs();
         railPowered = true;
