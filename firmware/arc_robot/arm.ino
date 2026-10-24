@@ -125,13 +125,6 @@ void servoTick() {
     if (wristLevelActive()) writeWrist(levelWristAngle());
 }
 
-bool armBusy() {
-    if (isOneServoMoving()) return true;
-    for (uint8_t j = 0; j < J_COUNT; j++)
-        if (jog[j].active) return true;
-    return false;
-}
-
 void stopArm() {
     stopAllServos();
     for (uint8_t j = 0; j < J_COUNT; j++) {

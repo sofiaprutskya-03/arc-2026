@@ -61,7 +61,6 @@ void startHoming() {
     railHomed = false;
     rail.setCurrentPosition(0);
     railMoveTo(-RAIL_MAX_STEPS * 12 / 10, RAIL_JOG_SPEED / 2);
-    homingStartMs = millis();
     mode = MODE_HOMING;
 #else
     setRailZero();

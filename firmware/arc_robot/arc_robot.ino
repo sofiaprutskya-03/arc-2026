@@ -34,7 +34,6 @@ Preferences prefs;
 enum Joint : uint8_t { J_BASE, J_SHOULDER, J_ELBOW, J_WRIST, J_COUNT };
 const int16_t JOINT_MIN[J_COUNT] = {BASE_MIN, SHOULDER_MIN, ELBOW_MIN, WRIST_MIN};
 const int16_t JOINT_MAX[J_COUNT] = {BASE_MAX, SHOULDER_MAX, ELBOW_MAX, WRIST_MAX};
-const char *const JOINT_NAME[J_COUNT] = {"база", "плече", "лікоть", "зап'ясток"};
 
 const uint32_t CAL_MAGIC = 0xA4C30000UL | (ARM_CELLS << 8) | RAIL_SLOTS;
 const int32_t RAIL_MAX_STEPS = (int32_t)(RAIL_LENGTH_MM * RAIL_STEPS_PER_MM);
@@ -64,8 +63,6 @@ AutoStep steps[MAX_STEPS];
 uint8_t stepCount = 0, stepIndex = 0;
 bool stepStarted = false;
 uint32_t stepStartMs = 0, stepTimeoutMs = 0;
-
-uint32_t homingStartMs = 0;
 
 JoyAxis joyX = {PIN_JOY_X, JOY_INVERT_X, 2048, 0, false};
 JoyAxis joyY = {PIN_JOY_Y, JOY_INVERT_Y, 2048, 0, false};
