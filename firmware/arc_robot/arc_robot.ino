@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "robot_types.h"
+#include "pin_check.h"
 
 #define ENABLE_MIN_AND_MAX_CONSTRAINTS
 #include "ServoEasing.hpp"
