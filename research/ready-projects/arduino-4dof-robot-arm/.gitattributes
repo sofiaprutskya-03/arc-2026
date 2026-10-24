@@ -1,0 +1,16 @@
+* text=auto
+
+*.md text eol=lf
+*.ino text eol=lf linguist-language=C++
+*.ipynb text eol=lf linguist-documentation=true
+*.svg text eol=lf
+
+*.jpg binary
+*.gif binary
+*.mp4 binary
+
+assets/diagrams/*.svg linguist-generated=true
+assets/images/* linguist-generated=true
+assets/media/* linguist-generated=true
+assets/reference/* linguist-generated=true
+assets/plots/*.svg linguist-generated=true

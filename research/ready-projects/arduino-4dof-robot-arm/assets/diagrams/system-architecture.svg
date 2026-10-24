@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Arduino 4DOF robot arm system architecture</title>
+  <desc id="desc">Clean signal flow from the operator through two joysticks, the Arduino controller, the servo output layer, and four actuators. Pose memory connects bidirectionally to the controller and external power follows a separate routed bus.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1">
+      <stop offset="0" stop-color="#0f4c81"/>
+      <stop offset="1" stop-color="#1597a5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#14324a" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#42647d"/>
+    </marker>
+    <marker id="arrowStart" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M9,0 L9,6 L0,3 z" fill="#42647d"/>
+    </marker>
+    <marker id="powerArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d16a20"/>
+    </marker>
+    <style>
+      .box { fill:#fff; stroke:#bfd0dc; stroke-width:2; rx:16; filter:url(#shadow); }
+      .label { font:700 18px Arial, sans-serif; fill:#17364d; text-anchor:middle; }
+      .small { font:14px Arial, sans-serif; fill:#527086; text-anchor:middle; }
+      .pin { font:700 13px Consolas, monospace; fill:#0f6c78; text-anchor:middle; }
+      .flow { fill:none; stroke:#42647d; stroke-width:3; marker-end:url(#arrow); }
+      .memory { fill:none; stroke:#42647d; stroke-width:3; marker-start:url(#arrowStart); marker-end:url(#arrow); }
+      .power { fill:none; stroke:#d16a20; stroke-width:3; stroke-dasharray:8 6; marker-end:url(#powerArrow); }
+      .routeLabel { font:700 12px Arial, sans-serif; fill:#42647d; text-anchor:middle; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="700" fill="#f4f8fb"/>
+  <rect width="1200" height="92" fill="url(#header)"/>
+  <text x="56" y="45" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#fff">System Architecture</text>
+  <text x="56" y="71" font-family="Arial, sans-serif" font-size="15" fill="#d8f2f3">Manual control and open-loop pose replay on an Arduino-compatible controller</text>
+
+  <rect class="box" x="45" y="180" width="180" height="112"/>
+  <text class="label" x="135" y="221">Operator</text>
+  <text class="small" x="135" y="249">Two thumbsticks</text>
+  <text class="small" x="135" y="273">and push buttons</text>
+
+  <rect class="box" x="285" y="154" width="220" height="164"/>
+  <text class="label" x="395" y="194">Joystick inputs</text>
+  <text class="pin" x="395" y="226">A2, A5, D7</text>
+  <text class="pin" x="395" y="250">A3, A4, D8</text>
+  <text class="small" x="395" y="281">10-bit ADC + buttons</text>
+  <text class="small" x="395" y="303">Thresholded direction input</text>
+
+  <rect class="box" x="565" y="136" width="245" height="200"/>
+  <text class="label" x="687.5" y="176">Arduino controller</text>
+  <text class="small" x="687.5" y="203">ATmega328P control loop</text>
+  <rect x="595" y="222" width="185" height="42" rx="10" fill="#e7f5f6" stroke="#8fc6cc"/>
+  <text class="small" x="687.5" y="248">Threshold + limit logic</text>
+  <rect x="595" y="278" width="185" height="42" rx="10" fill="#eaf0f9" stroke="#9db8d4"/>
+  <text class="small" x="687.5" y="304">Servo setpoint update</text>
+
+  <rect class="box" x="870" y="143" width="270" height="186"/>
+  <text class="label" x="1005" y="183">Servo output layer</text>
+  <text class="small" x="1005" y="210">Arduino Servo library</text>
+  <text class="pin" x="1005" y="239">A1 &#183; A0 &#183; D6 &#183; D9</text>
+  <rect x="905" y="260" width="200" height="50" rx="10" fill="#fff5e9" stroke="#e2ae72"/>
+  <text class="small" x="1005" y="282">Shield distributes signal,</text>
+  <text class="small" x="1005" y="301">5 V, and common ground</text>
+
+  <rect class="box" x="565" y="422" width="245" height="124"/>
+  <text class="label" x="687.5" y="462">Pose memory</text>
+  <text class="small" x="687.5" y="491">1, 10, or 20 angle vectors</text>
+  <text class="small" x="687.5" y="517">One-degree replay steps</text>
+
+  <rect class="box" x="870" y="422" width="270" height="124"/>
+  <text class="label" x="1005" y="462">Four actuators</text>
+  <text class="small" x="1005" y="491">Base &#183; shoulder &#183; elbow</text>
+  <text class="small" x="1005" y="517">Gripper open / close</text>
+
+  <rect class="box" x="285" y="535" width="220" height="96"/>
+  <text class="label" x="395" y="574">External power</text>
+  <text class="small" x="395" y="603">7-15 V into shield VIN</text>
+
+  <path class="flow" d="M225 236 H285"/>
+  <path class="flow" d="M505 236 H565"/>
+  <path class="flow" d="M810 236 H870"/>
+  <path class="flow" d="M1005 329 V422"/>
+  <path class="memory" d="M687.5 336 V422"/>
+  <path class="power" d="M505 583 H1160 V286 H1140"/>
+
+  <text class="routeLabel" x="535" y="222">inputs</text>
+  <text class="routeLabel" x="840" y="222">setpoints</text>
+  <text class="routeLabel" x="725" y="382">save / replay</text>
+  <text x="825" y="601" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#d16a20" text-anchor="middle">dedicated servo-power route</text>
+
+  <rect x="45" y="650" width="1095" height="34" rx="11" fill="#e7eef3"/>
+  <text x="592.5" y="672" font-family="Arial, sans-serif" font-size="14" fill="#42647d" text-anchor="middle">Pose memory stores commanded angles only; the mechanism has no encoder feedback.</text>
+</svg>

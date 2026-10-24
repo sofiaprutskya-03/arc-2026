@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Sequential versus synchronized four-joint command trajectories</title>
+  <desc id="desc">For the illustrative transition from 80,60,130,0 degrees to 20,100,60,90 degrees, sequential replay takes 260 scheduler ticks while synchronized interpolation takes 90 ticks.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1"><stop offset="0" stop-color="#0f4c81"/><stop offset="1" stop-color="#1597a5"/></linearGradient>
+    <style>
+      .axis { stroke:#34546b; stroke-width:2.5; }
+      .grid { stroke:#d2dde5; stroke-width:1; stroke-dasharray:5 6; }
+      .tick { font:13px Arial, sans-serif; fill:#527086; text-anchor:middle; }
+      .panel { fill:#fff; stroke:#bfd0dc; stroke-width:2; rx:15; }
+      .s1 { fill:none; stroke:#0f6c78; stroke-width:5; }
+      .s2 { fill:none; stroke:#3266a8; stroke-width:5; }
+      .s3 { fill:none; stroke:#d16a20; stroke-width:5; }
+      .s4 { fill:none; stroke:#7d55a3; stroke-width:5; }
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#f5f8fb"/>
+  <rect width="1200" height="92" fill="url(#header)"/>
+  <text x="55" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#fff">Sequential vs. Synchronized Replay</text>
+  <text x="55" y="70" font-family="Arial, sans-serif" font-size="15" fill="#d8f2f3">Illustrative transition qA = [80, 60, 130, 0] degrees to qB = [20, 100, 60, 90] degrees</text>
+
+  <rect class="panel" x="55" y="128" width="530" height="470"/>
+  <rect class="panel" x="615" y="128" width="530" height="470"/>
+  <text x="320" y="165" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#17364d" text-anchor="middle">Current sequential scheduler</text>
+  <text x="880" y="165" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#17364d" text-anchor="middle">Ideal synchronized scheduler</text>
+
+  <line class="axis" x1="110" y1="540" x2="540" y2="540"/><line class="axis" x1="110" y1="190" x2="110" y2="540"/>
+  <line class="axis" x1="670" y1="540" x2="1100" y2="540"/><line class="axis" x1="670" y1="190" x2="670" y2="540"/>
+  <line class="grid" x1="110" y1="365" x2="540" y2="365"/><line class="grid" x1="670" y1="365" x2="1100" y2="365"/>
+  <line class="grid" x1="110" y1="190" x2="540" y2="190"/><line class="grid" x1="670" y1="190" x2="1100" y2="190"/>
+
+  <text class="tick" x="110" y="564">0</text><text class="tick" x="209" y="564">60</text><text class="tick" x="275" y="564">100</text><text class="tick" x="391" y="564">170</text><text class="tick" x="540" y="564">260</text>
+  <text class="tick" x="670" y="564">0</text><text class="tick" x="1100" y="564">90</text>
+  <text x="325" y="588" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#17364d" text-anchor="middle">scheduler tick n</text>
+  <text x="885" y="588" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#17364d" text-anchor="middle">scheduler tick n</text>
+  <text transform="translate(82 365) rotate(-90)" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#17364d" text-anchor="middle">commanded angle (degrees)</text>
+  <text transform="translate(642 365) rotate(-90)" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#17364d" text-anchor="middle">commanded angle (degrees)</text>
+  <text x="92" y="545" class="tick">0</text><text x="92" y="370" class="tick">90</text><text x="92" y="195" class="tick">180</text>
+  <text x="652" y="545" class="tick">0</text><text x="652" y="370" class="tick">90</text><text x="652" y="195" class="tick">180</text>
+
+  <!-- Sequential piecewise trajectories -->
+  <path class="s1" d="M110 384 L209 501 L540 501"/>
+  <path class="s2" d="M110 423 L209 423 L275 345 L540 345"/>
+  <path class="s3" d="M110 287 L275 287 L391 423 L540 423"/>
+  <path class="s4" d="M110 540 L391 540 L540 365"/>
+  <!-- Synchronized trajectories -->
+  <path class="s1" d="M670 384 L1100 501"/>
+  <path class="s2" d="M670 423 L1100 345"/>
+  <path class="s3" d="M670 287 L1100 423"/>
+  <path class="s4" d="M670 540 L1100 365"/>
+
+  <line x1="210" y1="620" x2="250" y2="620" class="s1"/><text x="260" y="625" font-family="Arial, sans-serif" font-size="14" fill="#527086">Servo 1</text>
+  <line x1="360" y1="620" x2="400" y2="620" class="s2"/><text x="410" y="625" font-family="Arial, sans-serif" font-size="14" fill="#527086">Servo 2</text>
+  <line x1="510" y1="620" x2="550" y2="620" class="s3"/><text x="560" y="625" font-family="Arial, sans-serif" font-size="14" fill="#527086">Servo 3</text>
+  <line x1="660" y1="620" x2="700" y2="620" class="s4"/><text x="710" y="625" font-family="Arial, sans-serif" font-size="14" fill="#527086">Servo 4</text>
+
+  <rect x="140" y="660" width="410" height="60" rx="14" fill="#fff0e6" stroke="#e3ad73"/>
+  <text x="345" y="686" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#b75d1c" text-anchor="middle">260 ticks x 5 ms = 1.30 s</text>
+  <text x="345" y="708" font-family="Arial, sans-serif" font-size="13" fill="#527086" text-anchor="middle">one joint moves at a time</text>
+  <rect x="650" y="660" width="410" height="60" rx="14" fill="#e7f5f6" stroke="#8fc6cc"/>
+  <text x="855" y="686" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0f6c78" text-anchor="middle">90 ticks x 5 ms = 0.45 s</text>
+  <text x="855" y="708" font-family="Arial, sans-serif" font-size="13" fill="#527086" text-anchor="middle">all joints finish together; 2.889x fewer ticks</text>
+</svg>

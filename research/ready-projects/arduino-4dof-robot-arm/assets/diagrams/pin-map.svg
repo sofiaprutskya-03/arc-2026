@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="840" viewBox="0 0 1300 840" role="img" aria-labelledby="title desc">
+  <title id="title">Arduino 4DOF robot arm pin map</title>
+  <desc id="desc">A clean pin-by-pin connection map between two joystick modules, an Arduino-compatible controller and driver shield, four servos, USB, and the external servo supply.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#14324a" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      .card { fill:#fff; stroke:#c3d1dc; stroke-width:2; rx:16; filter:url(#shadow); }
+      .title { font:700 20px Arial, sans-serif; fill:#17364d; text-anchor:middle; }
+      .text { font:14px Arial, sans-serif; fill:#527086; text-anchor:middle; }
+      .pin { font:700 14px Consolas, monospace; fill:#fff; text-anchor:middle; }
+      .wireA { stroke:#177e89; stroke-width:4; fill:none; stroke-linejoin:round; }
+      .wireD { stroke:#3266a8; stroke-width:4; fill:none; stroke-linejoin:round; }
+      .wireP { stroke:#d16a20; stroke-width:4; stroke-dasharray:9 6; fill:none; stroke-linejoin:round; }
+      .endpointA { fill:#177e89; }
+      .endpointD { fill:#3266a8; }
+      .endpointP { fill:#d16a20; }
+    </style>
+  </defs>
+
+  <rect width="1300" height="840" fill="#f5f8fb"/>
+  <text x="650" y="48" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#17364d" text-anchor="middle">Pin Map and Power Connections</text>
+  <text x="650" y="76" font-family="Arial, sans-serif" font-size="15" fill="#607b8e" text-anchor="middle">Keyestudio V4.0 / Arduino Uno-compatible controller with TB6612FNG servo shield</text>
+
+  <rect class="card" x="470" y="120" width="360" height="530"/>
+  <rect x="470" y="120" width="360" height="74" rx="16" fill="#0f6c78"/>
+  <path d="M470 178 H830 V194 H470 Z" fill="#0f6c78"/>
+  <text x="650" y="165" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#fff" text-anchor="middle">Controller + Driver Shield</text>
+  <text class="text" x="650" y="225">ATmega328P &#183; 5 V logic &#183; common ground</text>
+
+  <text x="520" y="258" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#527086" text-anchor="middle">JOYSTICK INPUTS</text>
+  <text x="780" y="258" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#527086" text-anchor="middle">SERVO SIGNALS</text>
+
+  <rect x="470" y="276" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="522.5" y="299">A2 / X</text>
+  <rect x="470" y="326" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="522.5" y="349">A5 / Y</text>
+  <rect x="470" y="376" width="105" height="34" rx="8" fill="#3266a8"/><text class="pin" x="522.5" y="399">D7 / SW</text>
+  <rect x="470" y="446" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="522.5" y="469">A3 / X</text>
+  <rect x="470" y="496" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="522.5" y="519">A4 / Y</text>
+  <rect x="470" y="546" width="105" height="34" rx="8" fill="#3266a8"/><text class="pin" x="522.5" y="569">D8 / SW</text>
+
+  <rect x="725" y="276" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="777.5" y="299">A1 / S1</text>
+  <rect x="725" y="356" width="105" height="34" rx="8" fill="#177e89"/><text class="pin" x="777.5" y="379">A0 / S2</text>
+  <rect x="725" y="436" width="105" height="34" rx="8" fill="#3266a8"/><text class="pin" x="777.5" y="459">D6 / S3</text>
+  <rect x="725" y="516" width="105" height="34" rx="8" fill="#3266a8"/><text class="pin" x="777.5" y="539">D9 / S4</text>
+
+  <rect class="card" x="45" y="244" width="285" height="142"/>
+  <text class="title" x="187.5" y="282">Right joystick</text>
+  <text class="text" x="187.5" y="316">X &#8594; A2 &#183; Y &#8594; A5</text>
+  <text class="text" x="187.5" y="344">Button &#8594; D7</text>
+  <text class="text" x="187.5" y="368">5 V &#183; GND</text>
+
+  <rect class="card" x="45" y="438" width="285" height="142"/>
+  <text class="title" x="187.5" y="476">Left joystick</text>
+  <text class="text" x="187.5" y="510">X &#8594; A3 &#183; Y &#8594; A4</text>
+  <text class="text" x="187.5" y="538">Button &#8594; D8</text>
+  <text class="text" x="187.5" y="562">5 V &#183; GND</text>
+
+  <rect class="card" x="970" y="248" width="285" height="74"/>
+  <text class="title" x="1112.5" y="278">Servo 1 &#183; Base</text><text class="text" x="1112.5" y="304">Signal A1</text>
+  <rect class="card" x="970" y="348" width="285" height="74"/>
+  <text class="title" x="1112.5" y="378">Servo 2 &#183; Shoulder</text><text class="text" x="1112.5" y="404">Signal A0</text>
+  <rect class="card" x="970" y="448" width="285" height="74"/>
+  <text class="title" x="1112.5" y="478">Servo 3 &#183; Elbow</text><text class="text" x="1112.5" y="504">Signal D6</text>
+  <rect class="card" x="970" y="548" width="285" height="74"/>
+  <text class="title" x="1112.5" y="578">Servo 4 &#183; Gripper</text><text class="text" x="1112.5" y="604">Signal D9</text>
+
+  <rect class="card" x="370" y="708" width="270" height="78"/>
+  <text class="title" x="505" y="739">USB</text><text class="text" x="505" y="766">Programming + serial monitor</text>
+  <rect class="card" x="680" y="708" width="300" height="78"/>
+  <text class="title" x="830" y="739">External supply</text><text class="text" x="830" y="766">7-15 V &#8594; shield VIN</text>
+
+  <!-- Each connection has its own horizontal lane; no wires cross. -->
+  <path class="wireA" d="M330 293 H470"/><circle class="endpointA" cx="330" cy="293" r="5"/><circle class="endpointA" cx="470" cy="293" r="5"/>
+  <path class="wireA" d="M330 343 H470"/><circle class="endpointA" cx="330" cy="343" r="5"/><circle class="endpointA" cx="470" cy="343" r="5"/>
+  <path class="wireD" d="M330 393 H470"/><circle class="endpointD" cx="330" cy="393" r="5"/><circle class="endpointD" cx="470" cy="393" r="5"/>
+  <path class="wireA" d="M330 463 H470"/><circle class="endpointA" cx="330" cy="463" r="5"/><circle class="endpointA" cx="470" cy="463" r="5"/>
+  <path class="wireA" d="M330 513 H470"/><circle class="endpointA" cx="330" cy="513" r="5"/><circle class="endpointA" cx="470" cy="513" r="5"/>
+  <path class="wireD" d="M330 563 H470"/><circle class="endpointD" cx="330" cy="563" r="5"/><circle class="endpointD" cx="470" cy="563" r="5"/>
+
+  <path class="wireA" d="M830 293 H970"/><circle class="endpointA" cx="830" cy="293" r="5"/><circle class="endpointA" cx="970" cy="293" r="5"/>
+  <path class="wireA" d="M830 373 H900 V385 H970"/><circle class="endpointA" cx="830" cy="373" r="5"/><circle class="endpointA" cx="970" cy="385" r="5"/>
+  <path class="wireD" d="M830 453 H900 V485 H970"/><circle class="endpointD" cx="830" cy="453" r="5"/><circle class="endpointD" cx="970" cy="485" r="5"/>
+  <path class="wireD" d="M830 533 H900 V585 H970"/><circle class="endpointD" cx="830" cy="533" r="5"/><circle class="endpointD" cx="970" cy="585" r="5"/>
+
+  <path class="wireD" d="M560 650 V680 H505 V708"/><circle class="endpointD" cx="560" cy="650" r="5"/><circle class="endpointD" cx="505" cy="708" r="5"/>
+  <path class="wireP" d="M760 650 V680 H830 V708"/><circle class="endpointP" cx="760" cy="650" r="5"/><circle class="endpointP" cx="830" cy="708" r="5"/>
+
+  <circle cx="70" cy="754" r="7" fill="#177e89"/><text x="87" y="759" font-family="Arial, sans-serif" font-size="14" fill="#527086">Analog signal</text>
+  <circle cx="200" cy="754" r="7" fill="#3266a8"/><text x="217" y="759" font-family="Arial, sans-serif" font-size="14" fill="#527086">Digital / servo signal</text>
+  <line x1="1055" y1="754" x2="1095" y2="754" class="wireP"/><text x="1107" y="759" font-family="Arial, sans-serif" font-size="14" fill="#527086">Power</text>
+</svg>

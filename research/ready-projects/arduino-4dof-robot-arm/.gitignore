@@ -1,0 +1,19 @@
+# Arduino build products
+build/
+*.elf
+*.hex
+*.map
+
+# Notebook and Python caches
+notebooks/.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local scratch space
+tmp/

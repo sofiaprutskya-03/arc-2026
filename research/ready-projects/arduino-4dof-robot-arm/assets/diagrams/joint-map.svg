@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Physical joint and servo map for the 4DOF robot arm</title>
+  <desc id="desc">A simplified side view labels Servo 1 at the rotating base, Servo 2 at the shoulder, Servo 3 at the elbow linkage, and Servo 4 at the gripper, together with their Arduino signal pins.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1">
+      <stop offset="0" stop-color="#0f4c81"/>
+      <stop offset="1" stop-color="#1597a5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#14324a" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      .card { fill:#fff; stroke:#bfd0dc; stroke-width:2; rx:15; filter:url(#shadow); }
+      .joint { fill:#1597a5; stroke:#0f6574; stroke-width:4; }
+      .link { fill:none; stroke:#273f52; stroke-width:28; stroke-linecap:round; stroke-linejoin:round; }
+      .linkEdge { fill:none; stroke:#8fa8b9; stroke-width:4; stroke-linecap:round; }
+      .wire { fill:none; stroke:#42647d; stroke-width:3; stroke-linejoin:round; }
+      .name { font:700 19px Arial, sans-serif; fill:#17364d; }
+      .pin { font:700 14px Consolas, monospace; fill:#0f6c78; }
+      .detail { font:14px Arial, sans-serif; fill:#527086; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="680" fill="#f4f8fb"/>
+  <rect width="1200" height="92" fill="url(#header)"/>
+  <text x="54" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#fff">Physical Joint and Servo Map</text>
+  <text x="54" y="70" font-family="Arial, sans-serif" font-size="15" fill="#d8f2f3">Simplified side view - functional joint names and source-verified signal pins</text>
+
+  <!-- Simplified mechanical structure -->
+  <ellipse cx="342" cy="590" rx="145" ry="28" fill="#263f52" opacity="0.16"/>
+  <rect x="225" y="548" width="235" height="48" rx="12" fill="#334f64"/>
+  <rect x="276" y="505" width="132" height="55" rx="10" fill="#486b82"/>
+  <path class="link" d="M342 520 L385 425 L510 292 L650 211"/>
+  <path class="linkEdge" d="M342 520 L385 425 L510 292 L650 211"/>
+  <path d="M650 211 L700 180" stroke="#273f52" stroke-width="18" stroke-linecap="round"/>
+  <path d="M650 211 L706 228" stroke="#273f52" stroke-width="18" stroke-linecap="round"/>
+  <path d="M699 180 L728 160 M704 228 L737 237" stroke="#1597a5" stroke-width="9" stroke-linecap="round"/>
+
+  <circle class="joint" cx="342" cy="520" r="25"/>
+  <circle class="joint" cx="385" cy="425" r="25"/>
+  <circle class="joint" cx="510" cy="292" r="25"/>
+  <circle class="joint" cx="650" cy="211" r="25"/>
+  <text x="342" y="526" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+  <text x="385" y="431" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+  <text x="510" y="298" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+  <text x="650" y="217" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+
+  <path d="M292 506 A62 34 0 0 1 390 505" fill="none" stroke="#d16a20" stroke-width="4" stroke-dasharray="7 5"/>
+  <path d="M377 467 A48 48 0 0 1 421 423" fill="none" stroke="#d16a20" stroke-width="4" stroke-dasharray="7 5"/>
+  <path d="M500 335 A52 52 0 0 1 551 291" fill="none" stroke="#d16a20" stroke-width="4" stroke-dasharray="7 5"/>
+  <path d="M679 188 Q710 208 682 232" fill="none" stroke="#d16a20" stroke-width="4" stroke-dasharray="7 5"/>
+
+  <!-- Four independent callout lanes -->
+  <path class="wire" d="M650 211 H775"/><circle cx="650" cy="211" r="6" fill="#42647d"/>
+  <path class="wire" d="M510 292 H735 V321 H775"/><circle cx="510" cy="292" r="6" fill="#42647d"/>
+  <path class="wire" d="M385 425 H720 V431 H775"/><circle cx="385" cy="425" r="6" fill="#42647d"/>
+  <path class="wire" d="M342 520 H690 V541 H775"/><circle cx="342" cy="520" r="6" fill="#42647d"/>
+
+  <rect class="card" x="775" y="157" width="370" height="108"/>
+  <text class="name" x="806" y="191">Servo 4 - Gripper</text>
+  <text class="pin" x="806" y="218">D9</text>
+  <text class="detail" x="860" y="218">opens and closes the claw</text>
+  <text class="detail" x="806" y="244">Left joystick X axis</text>
+
+  <rect class="card" x="775" y="277" width="370" height="108"/>
+  <text class="name" x="806" y="311">Servo 3 - Elbow linkage</text>
+  <text class="pin" x="806" y="338">D6</text>
+  <text class="detail" x="860" y="338">extends or retracts the lower arm</text>
+  <text class="detail" x="806" y="364">Left joystick Y axis</text>
+
+  <rect class="card" x="775" y="397" width="370" height="108"/>
+  <text class="name" x="806" y="431">Servo 2 - Shoulder linkage</text>
+  <text class="pin" x="806" y="458">A0</text>
+  <text class="detail" x="860" y="458">raises or lowers the upper arm</text>
+  <text class="detail" x="806" y="484">Right joystick Y axis</text>
+
+  <rect class="card" x="775" y="517" width="370" height="108"/>
+  <text class="name" x="806" y="551">Servo 1 - Rotating base</text>
+  <text class="pin" x="806" y="578">A1</text>
+  <text class="detail" x="860" y="578">rotates the complete arm left or right</text>
+  <text class="detail" x="806" y="604">Right joystick X axis</text>
+
+  <rect x="54" y="626" width="650" height="34" rx="11" fill="#e7eef3"/>
+  <text x="379" y="648" font-family="Arial, sans-serif" font-size="13" fill="#42647d" text-anchor="middle">Joint names are functional labels; exact motion depends on horn orientation and linkage assembly.</text>
+</svg>

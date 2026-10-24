@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Joystick threshold command function</title>
+  <desc id="desc">The Arduino command is minus one below ADC value 50, zero from 50 through 1000, and plus one above 1000.</desc>
+  <defs>
+    <linearGradient id="header" x1="0" x2="1"><stop offset="0" stop-color="#0f4c81"/><stop offset="1" stop-color="#1597a5"/></linearGradient>
+    <style>
+      .axis { stroke:#34546b; stroke-width:3; }
+      .grid { stroke:#cbd8e1; stroke-width:1.5; stroke-dasharray:6 6; }
+      .tick { font:14px Arial, sans-serif; fill:#527086; text-anchor:middle; }
+      .ylabel { font:700 15px Arial, sans-serif; fill:#17364d; text-anchor:end; }
+      .note { font:14px Arial, sans-serif; fill:#527086; text-anchor:middle; }
+    </style>
+  </defs>
+  <rect width="1200" height="650" fill="#f5f8fb"/>
+  <rect width="1200" height="92" fill="url(#header)"/>
+  <text x="55" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#fff">Joystick Threshold Response</text>
+  <text x="55" y="70" font-family="Arial, sans-serif" font-size="15" fill="#d8f2f3">Source constants: lower threshold 50, upper threshold 1000, 10-bit ADC range 0-1023</text>
+
+  <rect x="100" y="140" width="49" height="400" fill="#fff0e6"/>
+  <rect x="149" y="140" width="928" height="400" fill="#e8f5f4"/>
+  <rect x="1077" y="140" width="23" height="400" fill="#eaf0fa"/>
+
+  <line class="grid" x1="100" y1="200" x2="1100" y2="200"/>
+  <line class="grid" x1="100" y1="340" x2="1100" y2="340"/>
+  <line class="grid" x1="100" y1="480" x2="1100" y2="480"/>
+  <line class="grid" x1="149" y1="140" x2="149" y2="540"/>
+  <line class="grid" x1="1077" y1="140" x2="1077" y2="540"/>
+  <line class="axis" x1="100" y1="540" x2="1115" y2="540"/>
+  <line class="axis" x1="100" y1="130" x2="100" y2="550"/>
+
+  <path d="M100 480 H149 V340 H1077 V200 H1100" fill="none" stroke="#0f6c78" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="149" cy="480" r="6" fill="#d16a20"/><circle cx="149" cy="340" r="6" fill="#0f6c78"/>
+  <circle cx="1077" cy="340" r="6" fill="#0f6c78"/><circle cx="1077" cy="200" r="6" fill="#3266a8"/>
+
+  <text class="ylabel" x="83" y="205">+1</text><text class="ylabel" x="83" y="345">0</text><text class="ylabel" x="83" y="485">-1</text>
+  <text class="tick" x="100" y="570">0</text><text class="tick" x="149" y="570">50</text><text x="1067" y="570" font-family="Arial, sans-serif" font-size="14" fill="#527086" text-anchor="end">1000</text><text x="1110" y="570" font-family="Arial, sans-serif" font-size="14" fill="#527086" text-anchor="start">1023</text>
+  <text x="600" y="612" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#17364d" text-anchor="middle">ADC reading u</text>
+  <text transform="translate(38 340) rotate(-90)" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#17364d" text-anchor="middle">command c(u)</text>
+
+  <text class="note" x="124" y="166" fill="#d16a20">negative</text>
+  <text class="note" x="613" y="166">neutral zone: 50 to 1000</text>
+  <text class="note" x="1088" y="166" fill="#3266a8">positive</text>
+  <rect x="330" y="104" width="540" height="30" rx="10" fill="#fff" stroke="#bfd0dc"/>
+  <text class="note" x="600" y="124">Only near-endpoint readings produce motion; stick magnitude does not set speed.</text>
+</svg>
