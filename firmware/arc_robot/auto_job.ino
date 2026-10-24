@@ -31,6 +31,15 @@ void startJob(const uint8_t job[4]) {
         mode = MODE_MANUAL;
         return;
     }
+    for (uint8_t i = 0; i < 4; i++) {
+        bool isRail = i % 2 == 0;
+        if (!((isRail ? cal.railTaught : cal.cellTaught) & (1u << (job[i] - 1)))) {
+            Serial.printf("Не можу стартувати: %s %u ще не записана (ручний режим, '%c' + %u).\n",
+                          isRail ? "позиція рейки" : "комірка", job[i], isRail ? 'B' : 'A', job[i]);
+            mode = MODE_MANUAL;
+            return;
+        }
+    }
     memcpy(lastJob, job, 4);
     lastJobValid = true;
     buildJob(job);

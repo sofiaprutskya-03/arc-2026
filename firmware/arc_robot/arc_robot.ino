@@ -35,7 +35,7 @@ const int16_t JOINT_MIN[J_COUNT] = {BASE_MIN, SHOULDER_MIN, ELBOW_MIN, WRIST_MIN
 const int16_t JOINT_MAX[J_COUNT] = {BASE_MAX, SHOULDER_MAX, ELBOW_MAX, WRIST_MAX};
 const char *const JOINT_NAME[J_COUNT] = {"база", "плече", "лікоть", "зап'ясток"};
 
-const uint32_t CAL_MAGIC = 0xA4C20000UL | (ARM_CELLS << 8) | RAIL_SLOTS;
+const uint32_t CAL_MAGIC = 0xA4C30000UL | (ARM_CELLS << 8) | RAIL_SLOTS;
 const int32_t RAIL_MAX_STEPS = (int32_t)(RAIL_LENGTH_MM * RAIL_STEPS_PER_MM);
 
 Calibration cal;

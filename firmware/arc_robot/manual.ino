@@ -18,6 +18,7 @@ void teach(char prefix, uint8_t n) {
         }
         cal.cells[n - 1] = {(int16_t)lroundf(currentAngle(J_BASE)), (int16_t)lroundf(currentAngle(J_SHOULDER)),
                             (int16_t)lroundf(currentAngle(J_ELBOW))};
+        cal.cellTaught |= 1u << (n - 1);
         saveCal();
         Serial.printf("Комірка %u записана: база %d, плече %d, лікоть %d\n", n, cal.cells[n - 1].base,
                       cal.cells[n - 1].shoulder, cal.cells[n - 1].elbow);
@@ -31,6 +32,7 @@ void teach(char prefix, uint8_t n) {
             return;
         }
         cal.railSteps[n - 1] = rail.currentPosition();
+        cal.railTaught |= 1u << (n - 1);
         saveCal();
         Serial.printf("Позиція рейки %u записана: %.1f мм\n", n, railMm());
     }

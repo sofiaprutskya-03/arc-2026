@@ -21,8 +21,9 @@ void printStatus() {
         Serial.printf("  зап'ясток %.0f%s, зсув горизонту %d\n", wristAngle, cal.wristLevel ? " (авто)" : "",
                       cal.wristOffset);
     for (uint8_t i = 0; i < RAIL_SLOTS; i++)
-        Serial.printf("  рейка %u: %.1f мм\n", i + 1, cal.railSteps[i] / RAIL_STEPS_PER_MM);
+        Serial.printf("  рейка %u: %.1f мм%s\n", i + 1, cal.railSteps[i] / RAIL_STEPS_PER_MM,
+                      cal.railTaught & (1u << i) ? "" : " (не записано)");
     for (uint8_t i = 0; i < ARM_CELLS; i++)
-        Serial.printf("  комірка %u: база %d, плече %d, лікоть %d\n", i + 1, cal.cells[i].base, cal.cells[i].shoulder,
-                      cal.cells[i].elbow);
+        Serial.printf("  комірка %u: база %d, плече %d, лікоть %d%s\n", i + 1, cal.cells[i].base, cal.cells[i].shoulder,
+                      cal.cells[i].elbow, cal.cellTaught & (1u << i) ? "" : " (не записано)");
 }

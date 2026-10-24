@@ -31,6 +31,8 @@ struct Calibration {
     int32_t railSteps[RAIL_SLOTS];
     int16_t wristOffset;
     uint8_t wristLevel;
+    uint16_t cellTaught;
+    uint16_t railTaught;
 };
 
 struct Jog {

@@ -6,6 +6,8 @@ void loadDefaults() {
     for (uint8_t i = 0; i < RAIL_SLOTS; i++) cal.railSteps[i] = (int32_t)(slotsMm[i] * RAIL_STEPS_PER_MM);
     cal.wristOffset = WRIST_LEVEL_OFFSET;
     cal.wristLevel = WRIST_LEVEL_ENABLED_AT_START;
+    cal.cellTaught = 0;
+    cal.railTaught = 0;
 }
 
 void saveCal() {
