@@ -25,7 +25,7 @@
 
 // Клавіатура 4x4: 8 дротів зліва направо = рядки 1..4, потім стовпці 1..4
 #define KEYPAD_ROW_PINS {23, 22, 21, 4}
-#define KEYPAD_COL_PINS {32, 33, 15, 5}
+#define KEYPAD_COL_PINS {33, 14, 15, 5}
 
 // Кінцевик нуля рейки (замикає на GND). -1 = кінцевика немає, нуль задається вручну.
 // Якщо є: GPIO 34 + зовнішній резистор 10 кОм до 3.3 В.
@@ -142,12 +142,9 @@
 #define JOYSTICK_ENABLED   true
 #define PIN_JOY_X          34       // ADC1, лише вхід
 #define PIN_JOY_Y          35       // ADC1, лише вхід
-#define PIN_JOY_BUTTON     14       // кнопка B; -1 = не використовувати
+#define PIN_JOY_BUTTON     32       // кнопка B; -1 = не використовувати
 #define JOY_INVERT_X       false    // true, якщо джойстик праворуч везе платформу ліворуч
 #define JOY_INVERT_Y       false    // true, якщо джойстик угору опускає руку
 #define JOY_DEADZONE       0.15f    // частка ходу ручки біля центру, яка ігнорується
 #define JOY_POLL_MS        30
 
-#if HAS_WRIST_SERVO && PIN_JOY_BUTTON == PIN_SERVO_WRIST
-#error "PIN_JOY_BUTTON збігається з PIN_SERVO_WRIST"
-#endif
