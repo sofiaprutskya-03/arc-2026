@@ -41,7 +41,7 @@ void startJob(const uint8_t job[4]) {
 }
 
 void abortJob(const char *reason) {
-    rail.stop();  // AccelStepper гальмує з заданим прискоренням, без ривка
+    rail.stop();
     stopArm();
     mode = MODE_MANUAL;
     Serial.printf("ЗУПИНЕНО на кроці %u (%s): %s. Ручний режим.\n", stepIndex + 1,
@@ -62,7 +62,6 @@ void autoTick() {
         case STEP_ARM: expected = moveArmTo(s.pose, s.speed); break;
         case STEP_RAIL:
             railMoveTo(s.value, RAIL_MAX_SPEED);
-            // час руху з розгоном і запасом: ціль не досягнута за цей час = щось не так
             expected = (uint32_t)(abs(s.value - rail.currentPosition()) * 1000.0f / RAIL_MAX_SPEED +
                                   2000.0f * RAIL_MAX_SPEED / RAIL_ACCEL);
             break;

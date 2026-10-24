@@ -1,4 +1,3 @@
-// Клавіша -> суглоб і напрямок. Повертає false, якщо це не клавіша суглоба.
 bool jointForKey(char c, uint8_t &j, int8_t &dir) {
     switch (c) {
     case '1': j = J_BASE; dir = -1; return true;
@@ -82,7 +81,7 @@ void manualKeyUp(char c) {
     uint8_t j;
     int8_t dir;
     if (jointForKey(c, j, dir)) {
-        if (jog[j].dir == dir) jog[j].dir = 0;  // далі jogTick плавно гальмує до нуля
+        if (jog[j].dir == dir) jog[j].dir = 0;
     } else if (c == '4' || c == '6') {
         rail.stop();
     }

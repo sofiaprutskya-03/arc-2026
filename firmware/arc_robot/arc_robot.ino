@@ -1,17 +1,3 @@
-/*
- * ARC 2026 — маніпулятор із клешнею на лінійній платформі (ESP32, Keyestudio KS0413).
- *
- * Основа:
- *   ServoEasing 3.6 (ArminJo) — плавні траєкторії серв, синхронний рух суглобів.
- *     Використовується в режимі опитування (setEaseTo + updateAllServos), а не через
- *     переривання: в ESP32-гілці бібліотеки автор описує гонку з таймером, що дає
- *     "CORRUPT HEAP" (ServoEasing.hpp, коментар до isMovingAndCallYield).
- *   ESP32Servo 3.x — PWM для серв.
- *   AccelStepper 1.64 — 28BYJ-48 + ULN2003 у режимі HALF4WIRE, розгін і гальмування.
- *   Keypad (Mark Stanley) — матрична клавіатура 4x4, як в уроці KS5011 «Keypad Door».
- *
- * Карта клавіш і калібрування — README.md поруч.
- */
 #include <Arduino.h>
 #include <Preferences.h>
 #include <Keypad.h>
@@ -20,16 +6,12 @@
 #include "config.h"
 #include "robot_types.h"
 
-#define ENABLE_MIN_AND_MAX_CONSTRAINTS  // жорсткі межі кутів усередині ServoEasing
+#define ENABLE_MIN_AND_MAX_CONSTRAINTS
 #include "ServoEasing.hpp"
 
-// ---------------------------------------------------------------------------
-// Залізо
-// ---------------------------------------------------------------------------
 ServoEasing servoBase, servoShoulder, servoElbow, servoClaw;
-Servo servoWrist;  // зап'ясток пише сам вирівнювач, тому він поза групою ServoEasing
+Servo servoWrist;
 
-// Порядок IN1, IN3, IN2, IN4 обов'язковий для 28BYJ-48 у AccelStepper
 #if RAIL_INVERT_DIR
 AccelStepper rail(AccelStepper::HALF4WIRE, PIN_STEPPER_IN4, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN1);
 #else
@@ -48,9 +30,6 @@ Keypad keypad(makeKeymap(KEYMAP), keypadRowPins, keypadColPins, 4, 4);
 
 Preferences prefs;
 
-// ---------------------------------------------------------------------------
-// Стан
-// ---------------------------------------------------------------------------
 enum Joint : uint8_t { J_BASE, J_SHOULDER, J_ELBOW, J_WRIST, J_COUNT };
 const int16_t JOINT_MIN[J_COUNT] = {BASE_MIN, SHOULDER_MIN, ELBOW_MIN, WRIST_MIN};
 const int16_t JOINT_MAX[J_COUNT] = {BASE_MAX, SHOULDER_MAX, ELBOW_MAX, WRIST_MAX};
@@ -66,15 +45,15 @@ Jog jog[J_COUNT];
 float wristAngle = 90;
 bool clawClosed = false;
 
-bool railHomed = false;      // чи відома абсолютна позиція рейки
+bool railHomed = false;
 bool railPowered = false;
 bool railWasRunning = false;
 uint32_t railIdleSince = 0;
 
-char pendingPrefix = 0;      // 'A' або 'B' в ручному режимі чекає цифру
+char pendingPrefix = 0;
 uint32_t pendingSince = 0;
 
-uint8_t jobInput[4];         // A B C D, номери з 1
+uint8_t jobInput[4];
 uint8_t jobInputLen = 0;
 uint8_t lastJob[4];
 bool lastJobValid = false;
@@ -88,7 +67,7 @@ uint32_t stepStartMs = 0, stepTimeoutMs = 0;
 uint32_t homingStartMs = 0;
 
 void setup() {
-    Serial.setTxBufferSize(1024);  // друк не блокує цикл і не смикає кроковий
+    Serial.setTxBufferSize(1024);
     Serial.begin(SERIAL_BAUD);
     delay(300);
     Serial.println(F("\nARC 2026 robot, збірка " __DATE__ " " __TIME__));
@@ -96,7 +75,6 @@ void setup() {
     prefs.begin("arc", false);
     loadCal();
 
-    // Серво підключаємо по черзі одразу в безпечну позу: менший кидок струму
     servoBase.attach(PIN_SERVO_BASE, SAFE_BASE, SERVO_US_0DEG, SERVO_US_180DEG);
     delay(250);
     servoShoulder.attach(PIN_SERVO_SHOULDER, SAFE_SHOULDER, SERVO_US_0DEG, SERVO_US_180DEG);
@@ -126,7 +104,7 @@ void setup() {
     restoreRail();
 
 #if PIN_RAIL_LIMIT >= 0
-    pinMode(PIN_RAIL_LIMIT, INPUT);  // підтяжка зовнішня, на 34–39 внутрішньої немає
+    pinMode(PIN_RAIL_LIMIT, INPUT);
 #endif
 
     keypad.setDebounceTime(20);

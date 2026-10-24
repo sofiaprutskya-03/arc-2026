@@ -6,7 +6,6 @@ ServoEasing &easingServo(uint8_t j) {
     }
 }
 
-// Поточний кут у градусах з дробовою частиною (getCurrentAngle() повертає ціле)
 float currentAngle(uint8_t j) {
     if (j == J_WRIST) return wristAngle;
     int us = easingServo(j).getCurrentMicroseconds();
@@ -53,8 +52,6 @@ ArmPose abovePose(ArmPose cell) {
     return clampPose(cell);
 }
 
-// Синхронний рух трьох суглобів: усі стартують і приходять одночасно,
-// профіль швидкості — квадратичний розгін/гальмування. Повертає тривалість, мс.
 uint32_t moveArmTo(ArmPose target, uint16_t degPerSec) {
     target = clampPose(target);
     const int16_t goal[3] = {target.base, target.shoulder, target.elbow};
@@ -80,8 +77,6 @@ uint32_t moveClaw(bool close) {
     return ms;
 }
 
-// Ручний рух з обмеженням прискорення: швидкість росте й падає плавно, а біля
-// межі суглоба вона заздалегідь зменшується так, щоб зупинитися точно на межі.
 void jogTick(float dt) {
     for (uint8_t j = 0; j < J_COUNT; j++) {
         Jog &g = jog[j];

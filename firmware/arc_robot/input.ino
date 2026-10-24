@@ -33,7 +33,6 @@ void pollKeypad() {
     }
 }
 
-// Serial не вміє «утримувати», тому клавіші руху з монітора роблять один крок
 void serialJog(char c) {
     uint8_t j;
     int8_t dir;

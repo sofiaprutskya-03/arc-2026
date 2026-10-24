@@ -3,7 +3,7 @@ float railMm() {
 }
 
 int32_t railMinSteps() {
-    return railHomed ? 0 : -RAIL_MAX_STEPS;  // без нуля дозволяємо їхати в обидва боки
+    return railHomed ? 0 : -RAIL_MAX_STEPS;
 }
 
 int32_t railMaxSteps() {
@@ -22,7 +22,7 @@ void railMoveTo(int32_t target, float speed) {
         rail.enableOutputs();
         railPowered = true;
     }
-    if (!rail.isRunning()) saveRailState(true);  // якщо ESP32 перезавантажиться посеред руху — знатимемо
+    if (!rail.isRunning()) saveRailState(true);
     rail.setMaxSpeed(speed);
     rail.moveTo(target);
 }
@@ -46,7 +46,6 @@ void railHousekeeping() {
         railPowered = false;
     }
 #if PIN_RAIL_LIMIT >= 0
-    // Кінцевик — це і захист, і точний нуль: торкнулися його, рухаючись до нуля, -> стоп
     if (mode != MODE_HOMING && digitalRead(PIN_RAIL_LIMIT) == LOW && rail.speed() < 0) {
         rail.setCurrentPosition(0);
         railHomed = true;
@@ -72,7 +71,7 @@ void homingTick() {
 #if PIN_RAIL_LIMIT >= 0
     if (digitalRead(PIN_RAIL_LIMIT) == LOW) {
         setRailZero();
-        railMoveTo((int32_t)(3 * RAIL_STEPS_PER_MM), RAIL_JOG_SPEED / 2);  // відʼїхати від кінцевика
+        railMoveTo((int32_t)(3 * RAIL_STEPS_PER_MM), RAIL_JOG_SPEED / 2);
         mode = MODE_MANUAL;
     } else if (!rail.isRunning()) {
         rail.setCurrentPosition(0);
