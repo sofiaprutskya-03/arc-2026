@@ -40,6 +40,11 @@ void startJob(const uint8_t job[4]) {
             return;
         }
     }
+    if (AUTO_RETURN_RAIL_HOME && !(cal.railTaught & 1u)) {
+        Serial.println(F("Не можу стартувати: позиція рейки 1 (повернення) ще не записана ('B' + 1)."));
+        mode = MODE_MANUAL;
+        return;
+    }
     memcpy(lastJob, job, 4);
     lastJobValid = true;
     buildJob(job);
