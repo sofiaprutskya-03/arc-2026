@@ -9,6 +9,7 @@ void printHelp() {
         " B+цифра  запамʼятати позицію платформи як N\n"
         " C    показати стан і таблицю      D    вирівнювання (якщо є серво зап'ястка)\n"
         " *    напівавтомат AB->CD\n"
+        "Джойстик: X — платформа, Y — плече, кнопка — клешня; у напівавтоматі рух ручки = СТОП\n"
         "Serial: ті самі символи (крок замість утримання), +/- зап'ясток (якщо є), x скинути калібрування, ? довідка"));
 }
 
@@ -17,6 +18,7 @@ void printStatus() {
                   railMm(), (long)rail.currentPosition(), railHomed ? "" : " [нуль НЕ задано]",
                   currentAngle(J_BASE), currentAngle(J_SHOULDER), currentAngle(J_ELBOW),
                   clawClosed ? "закрита" : "відкрита");
+    Serial.printf("  джойстик: %s\n", joystickOk ? "увімкнено" : "вимкнено");
     if (HAS_WRIST_SERVO)
         Serial.printf("  зап'ясток %.0f%s, зсув горизонту %d\n", wristAngle, cal.wristLevel ? " (авто)" : "",
                       cal.wristOffset);
