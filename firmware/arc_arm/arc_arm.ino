@@ -5,13 +5,14 @@
 // НАЛАШТУВАННЯ
 // ===================================
 
-const int SPEED = 40;        // град/с: швидкість суглобів (менше = плавніше)
-const int CLAW_STOP = 1500;  // мкс: клешня стоїть; якщо повзе сама — підібрати 1480–1520
-const int CLAW_SPEED = 100;  // швидкість клешні
+const int SPEED = 40;          // град/с: швидкість суглобів (менше = плавніше)
+const bool CLAW_360 = true;    // true: клешня на серво 360° (крутиться), false: звичайне серво на кут
+const int CLAW_STOP = 1500;    // для серво 360°: сигнал «стоп», підібрати 1480–1520, якщо повзе
 
 struct Joint {
+  const char *name;
   int pin;
-  float start;  // кут при ввімкненні = як рука стоїть без живлення
+  float start;   // кут при ввімкненні = як суглоб стоїть без живлення
   float minA;
   float maxA;
   float angle;
@@ -19,13 +20,14 @@ struct Joint {
   Servo servo;
 };
 
-Joint joints[3] = {
-  {18, 0, 0, 180},    // 1 — база
-  {19, 0, 0, 180},    // 2 — плече
-  {21, 180, 0, 180},  // 3 — лікоть
+Joint joints[4] = {
+  {"base", 18, 0, 0, 180},
+  {"shoulder", 19, 0, 0, 180},
+  {"elbow", 21, 180, 0, 180},
+  {"claw", 22, 90, 20, 160},
 };
 
-const int CLAW_PIN = 22;     // 4 — клешня (серво 360°)
+const int JOY_X = 34;
 const int JOY_Y = 35;
 const int JOY_SW = 23;
 byte rowPins[4] = {13, 14, 16, 17};
@@ -33,15 +35,24 @@ byte colPins[4] = {25, 26, 27, 32};
 
 // ===================================
 
+const int CLAW = 3;
 const float ACCEL = SPEED * 3.0f;
-const float DEAD_ZONE = 0.2f;
 
-Servo claw;
-float clawUs = CLAW_STOP;
+struct Axis {
+  int pin;
+  int center;
+  bool ok;
+  float filtered;
+};
+
+Axis axisX = {JOY_X, 2048, false, 0};
+Axis axisY = {JOY_Y, 2048, false, 0};
+
 int selected = 0;
 bool homing = false;
-int joyCenter = 2048;
-float joyFiltered = 0;
+float clawUs = CLAW_STOP;
+float serialCmd = 0;
+unsigned long serialCmdUntil = 0;
 
 char keys[4][4] = {
   {'1', '2', '3', 'A'},
@@ -60,15 +71,38 @@ float toward(float value, float target, float step) {
   return max(value - step, target);
 }
 
-float readJoystick() {
-  int raw = analogRead(JOY_Y);
-  float span = raw >= joyCenter ? 4095 - joyCenter : joyCenter;
-  float v = constrain((raw - joyCenter) / span, -1.0f, 1.0f);
-  joyFiltered += 0.3f * (v - joyFiltered);
-  float m = fabsf(joyFiltered);
-  if (m < DEAD_ZONE) return 0;
-  float s = (m - DEAD_ZONE) / (1 - DEAD_ZONE);
-  return copysignf(s * s, joyFiltered);
+void calibrate(Axis &a) {
+  long sum = 0;
+  int lo = 4095, hi = 0;
+  for (int i = 0; i < 32; i++) {
+    int v = analogRead(a.pin);
+    sum += v;
+    lo = min(lo, v);
+    hi = max(hi, v);
+    delay(2);
+  }
+  a.center = sum / 32;
+  a.ok = a.center > 800 && a.center < 3300 && hi - lo < 300;
+}
+
+float readAxis(Axis &a) {
+  if (!a.ok) return 0;
+  int raw = analogRead(a.pin);
+  float span = raw >= a.center ? 4095 - a.center : a.center;
+  float v = constrain((raw - a.center) / span, -1.0f, 1.0f);
+  a.filtered += 0.3f * (v - a.filtered);
+  float m = fabsf(a.filtered);
+  if (m < 0.2f) return 0;
+  float s = (m - 0.2f) / 0.8f;
+  return copysignf(s * s, a.filtered);
+}
+
+float readCommand() {
+  float x = readAxis(axisX);
+  float y = readAxis(axisY);
+  float cmd = fabsf(y) >= fabsf(x) ? y : x;
+  if (millis() < serialCmdUntil) cmd = serialCmd;
+  return cmd;
 }
 
 void moveJoint(Joint &j, float targetVel, float dt) {
@@ -80,11 +114,24 @@ void moveJoint(Joint &j, float targetVel, float dt) {
   j.servo.writeMicroseconds(angleToUs(j.angle));
 }
 
-void selectJoint(int s) {
-  selected = s;
+void selectJoint(int i) {
+  selected = i;
   homing = false;
-  Serial.print("Selected: ");
-  Serial.println(s);
+  Serial.print(">> selected ");
+  Serial.print(i + 1);
+  Serial.print(" - ");
+  Serial.println(joints[i].name);
+}
+
+void handleKey(char key) {
+  Serial.print(">> key ");
+  Serial.println(key);
+  if (key >= '1' && key <= '4') selectJoint(key - '1');
+  else if (key == '0') homing = true;
+  else if (key == '+' || key == '-') {
+    serialCmd = key == '+' ? 1 : -1;
+    serialCmdUntil = millis() + 300;
+  }
 }
 
 bool joyButtonPressed() {
@@ -108,31 +155,43 @@ void setup() {
   pinMode(JOY_SW, INPUT_PULLUP);
   analogReadResolution(12);
 
-  claw.setPeriodHertz(50);
-  claw.attach(CLAW_PIN, 1000, 2000);
-  claw.writeMicroseconds(CLAW_STOP);
-
-  for (Joint &j : joints) {
+  for (int i = 0; i < 4; i++) {
+    Joint &j = joints[i];
     j.angle = j.start;
     j.servo.setPeriodHertz(50);
-    j.servo.attach(j.pin, 500, 2500);
-    j.servo.writeMicroseconds(angleToUs(j.angle));
+    if (i == CLAW && CLAW_360) {
+      j.servo.attach(j.pin, 1000, 2000);
+      j.servo.writeMicroseconds(CLAW_STOP);
+    } else {
+      j.servo.attach(j.pin, 500, 2500);
+      j.servo.writeMicroseconds(angleToUs(j.angle));
+    }
     delay(300);
   }
 
-  long sum = 0;
-  for (int i = 0; i < 32; i++) sum += analogRead(JOY_Y);
-  int c = sum / 32;
-  if (c > 1000 && c < 3100) joyCenter = c;
+  calibrate(axisX);
+  calibrate(axisY);
 
-  Serial.println("Ready: 1 base | 2 shoulder | 3 elbow | 4 claw | 0 home | joystick button - next");
+  Serial.println();
+  Serial.println("=== ESP32 Robot Arm ===");
+  Serial.printf("Joystick X (GPIO %d): center %d %s\n", JOY_X, axisX.center, axisX.ok ? "OK" : "NOT FOUND");
+  Serial.printf("Joystick Y (GPIO %d): center %d %s\n", JOY_Y, axisY.center, axisY.ok ? "OK" : "NOT FOUND");
+  Serial.println("Keys: 1 base | 2 shoulder | 3 elbow | 4 claw | 0 home");
+  Serial.println("Serial Monitor: type 1-4, 0, + or - and press Enter");
+  selectJoint(0);
 }
 
 void loop() {
   char key = keypad.getKey();
-  if (key >= '1' && key <= '4') selectJoint(key - '0');
-  if (key == '0') homing = true;
-  if (joyButtonPressed()) selectJoint(selected % 4 + 1);
+  if (key) handleKey(key);
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c != '\n' && c != '\r' && c != ' ') handleKey(c);
+  }
+  if (joyButtonPressed()) {
+    Serial.println(">> joystick button");
+    selectJoint((selected + 1) % 4);
+  }
 
   static unsigned long lastTick = 0;
   unsigned long now = millis();
@@ -140,31 +199,34 @@ void loop() {
   float dt = min((now - lastTick) / 1000.0f, 0.1f);
   lastTick = now;
 
-  float cmd = readJoystick();
+  float cmd = readCommand();
   if (cmd != 0) homing = false;
 
   bool atHome = true;
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 4; i++) {
     Joint &j = joints[i];
+    if (i == CLAW && CLAW_360) {
+      float target = (selected == CLAW && !homing) ? CLAW_STOP + cmd * 100 : CLAW_STOP;
+      clawUs = toward(clawUs, target, 400 * dt);
+      j.servo.writeMicroseconds((int)(clawUs + 0.5f));
+      continue;
+    }
     float v = 0;
     if (homing) {
       v = constrain((j.start - j.angle) * 2, -(float)SPEED, (float)SPEED);
       if (fabsf(j.start - j.angle) > 0.5f) atHome = false;
-    } else if (selected == i + 1) {
+    } else if (i == selected) {
       v = cmd * SPEED;
     }
     moveJoint(j, v, dt);
   }
   if (atHome) homing = false;
 
-  float clawTarget = (selected == 4 && !homing) ? CLAW_STOP + cmd * CLAW_SPEED : CLAW_STOP;
-  clawUs = toward(clawUs, clawTarget, CLAW_SPEED * 4 * dt);
-  claw.writeMicroseconds((int)(clawUs + 0.5f));
-
   static unsigned long lastPrint = 0;
   if (now - lastPrint >= 500) {
     lastPrint = now;
-    Serial.printf("Sel %d | joy %.2f | base %.0f | shoulder %.0f | elbow %.0f | claw %d\n", selected, cmd,
-                  joints[0].angle, joints[1].angle, joints[2].angle, (int)clawUs);
+    Serial.printf("sel %s | joyX %d joyY %d | cmd %.2f | base %.0f shoulder %.0f elbow %.0f claw %.0f\n",
+                  joints[selected].name, analogRead(JOY_X), analogRead(JOY_Y), cmd, joints[0].angle,
+                  joints[1].angle, joints[2].angle, CLAW_360 ? clawUs : joints[CLAW].angle);
   }
 }
