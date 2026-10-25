@@ -39,18 +39,13 @@ void setup() {
   Serial.begin(9600);
   analogReadResolution(12);
 
-  for (int i = 0; i < 4; i++) {
-    servo[i].setPeriodHertz(50);
-    servo[i].attach(SERVO_PIN[i], 500, 2500);
-    writeServo(i);
-    delay(300);
-  }
+  for (int i = 0; i < 4; i++) servo[i].setPeriodHertz(50);
 
   long sum = 0;
   for (int i = 0; i < 20; i++) sum += analogRead(JOY_Y);
   joyCenter = sum / 20;
 
-  Serial.println("Ready. 1 base | 2 shoulder | 3 elbow | 4 claw, then move joystick up/down");
+  Serial.println("Ready. Servos are off until selected. 1 base | 2 shoulder | 3 elbow | 4 claw, then joystick up/down");
 }
 
 void loop() {
@@ -58,6 +53,10 @@ void loop() {
   if (!key && Serial.available()) key = Serial.read();
   if (key >= '1' && key <= '4') {
     selected = key - '1';
+    if (!servo[selected].attached()) {
+      servo[selected].attach(SERVO_PIN[selected], 500, 2500);
+      writeServo(selected);
+    }
     Serial.print("Selected: ");
     Serial.println(NAMES[selected]);
   }
@@ -72,7 +71,7 @@ void loop() {
   if (dev < -300) cmd = (dev + 300) / (float)(joyCenter - 300);
   cmd = constrain(cmd, -1.0f, 1.0f);
 
-  if (cmd != 0) {
+  if (cmd != 0 && servo[selected].attached()) {
     angle[selected] = constrain(angle[selected] + cmd * SPEED * 0.02f, MIN_ANGLE[selected], MAX_ANGLE[selected]);
     writeServo(selected);
   }
