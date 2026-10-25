@@ -15,13 +15,14 @@ const int joySW = 23;
 byte rowPins[4] = {13, 14, 16, 17};
 byte colPins[4] = {25, 26, 27, 32};
 
-// Стартова поза (в цю позу рука стає при ввімкненні та по клавіші 0)
-const float BASE_START = 90;
-const float ARM_START = 90;
+// Стартова поза: має збігатися з тим, як рука стоїть при вимкненому живленні,
+// інакше при ввімкненні її кидає. Ця ж поза — «додому» по клавіші 0.
+const float BASE_START = 0;
+const float ARM_START = 0;
 
 // Межі кутів: звузьте, якщо серво впирається й гуде на краю
-const float BASE_MIN = 10, BASE_MAX = 170;
-const float ARM_MIN = 10, ARM_MAX = 170;
+const float BASE_MIN = 0, BASE_MAX = 170;
+const float ARM_MIN = 0, ARM_MAX = 170;
 
 // Плавність
 const float MAX_SPEED = 60;     // град/с при повністю відхиленому джойстику
