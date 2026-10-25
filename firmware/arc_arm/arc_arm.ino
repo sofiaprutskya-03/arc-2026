@@ -6,33 +6,34 @@
 // ===================================
 
 // Піни
-const int servoPin1 = 18;   // база
-const int servoPin2 = 19;   // рука, серво A
-const int servoPin3 = 21;   // рука, серво B (дзеркально до A)
-const int servoPin4 = 22;   // клешня, серво безперервного обертання
-const int joyY = 35;
-const int joySW = 23;
+const int PIN_BASE = 18;      // серво під низом, поворот
+const int PIN_SHOULDER = 19;  // серво збоку, підйом руки
+const int PIN_ELBOW = 21;     // серво з іншого боку, виліт руки
+const int PIN_CLAW = 22;      // серво на клешні
+const int PIN_JOY_Y = 35;
+const int PIN_JOY_SW = 23;
 byte rowPins[4] = {13, 14, 16, 17};
 byte colPins[4] = {25, 26, 27, 32};
 
-// Стартова поза: має збігатися з тим, як рука стоїть при вимкненому живленні,
-// інакше при ввімкненні її кидає. Ця ж поза — «додому» по клавіші 0.
+// Стартові кути = як рука стоїть при вимкненому живленні.
+// Якщо при ввімкненні якийсь суглоб смикається, змініть його START.
+// Клавіша 0 плавно повертає руку в цю позу.
 const float BASE_START = 0;
-const float ARM_START = 0;
+const float SHOULDER_START = 0;
+const float ELBOW_START = 180;
+const float CLAW_START = 90;
 
 // Межі кутів: звузьте, якщо серво впирається й гуде на краю
-const float BASE_MIN = 0, BASE_MAX = 170;
-const float ARM_MIN = 0, ARM_MAX = 170;
+const float BASE_MIN = 0, BASE_MAX = 180;
+const float SHOULDER_MIN = 0, SHOULDER_MAX = 180;
+const float ELBOW_MIN = 0, ELBOW_MAX = 180;
+const float CLAW_MIN = 10, CLAW_MAX = 170;
 
 // Плавність
 const float MAX_SPEED = 60;     // град/с при повністю відхиленому джойстику
+const float CLAW_SPEED = 90;    // град/с для клешні
 const float ACCEL = 150;        // град/с^2: розгін і гальмування
-const float HOME_GAIN = 2.0;    // як м'яко рука під'їжджає додому
-
-// Клешня (серво безперервного обертання)
-const int GRIP_STOP_US = 1500;  // підберіть, якщо клешня повзе сама
-const int GRIP_MAX_DELTA = 100; // максимальна швидкість клешні, мкс від STOP
-const float GRIP_RAMP = 400;    // мкс/с: плавний старт і стоп клешні
+const float HOME_GAIN = 2.0;    // як м'яко рука під'їжджає в стартову позу
 
 // Джойстик
 const float DEAD_ZONE = 0.2;    // частка ходу ручки біля центру
@@ -44,20 +45,27 @@ const unsigned long TICK_MS = 20;
 // СТАН
 // ===================================
 
-Servo servo1, servo2, servo3, servo4;
-
 struct Joint {
+  const char *name;
+  int pin;
   float angle;
   float vel;
   float minA;
   float maxA;
+  float start;
+  float maxSpeed;
+  Servo servo;
 };
 
-Joint base = {BASE_START, 0, BASE_MIN, BASE_MAX};
-Joint arm = {ARM_START, 0, ARM_MIN, ARM_MAX};
-float gripUs = GRIP_STOP_US;
+const int JOINTS = 4;
+Joint joints[JOINTS] = {
+  {"base", PIN_BASE, BASE_START, 0, BASE_MIN, BASE_MAX, BASE_START, MAX_SPEED},
+  {"shoulder", PIN_SHOULDER, SHOULDER_START, 0, SHOULDER_MIN, SHOULDER_MAX, SHOULDER_START, MAX_SPEED},
+  {"elbow", PIN_ELBOW, ELBOW_START, 0, ELBOW_MIN, ELBOW_MAX, ELBOW_START, MAX_SPEED},
+  {"claw", PIN_CLAW, CLAW_START, 0, CLAW_MIN, CLAW_MAX, CLAW_START, CLAW_SPEED},
+};
 
-int selectedServo = 0;
+int selected = -1;
 bool homing = false;
 int joyCenter = 2048;
 float joyFiltered = 0;
@@ -78,12 +86,6 @@ int angleToUs(float a) {
   return 500 + (int)(a * 2000.0f / 180.0f + 0.5f);
 }
 
-void writeArm() {
-  servo1.writeMicroseconds(angleToUs(base.angle));
-  servo2.writeMicroseconds(angleToUs(arm.angle));
-  servo3.writeMicroseconds(angleToUs(180 - arm.angle));
-}
-
 float approach(float value, float target, float step) {
   if (value < target) return min(value + step, target);
   return max(value - step, target);
@@ -92,7 +94,7 @@ float approach(float value, float target, float step) {
 void calibrateJoystick() {
   long sum = 0;
   for (int i = 0; i < 32; i++) {
-    sum += analogRead(joyY);
+    sum += analogRead(PIN_JOY_Y);
     delay(2);
   }
   int c = sum / 32;
@@ -102,7 +104,7 @@ void calibrateJoystick() {
 }
 
 float readJoystick() {
-  int raw = analogRead(joyY);
+  int raw = analogRead(PIN_JOY_Y);
   float span = raw >= joyCenter ? 4095 - joyCenter : joyCenter;
   float v = constrain((raw - joyCenter) / span, -1.0f, 1.0f);
   if (INVERT_Y) v = -v;
@@ -124,24 +126,23 @@ void moveJoint(Joint &j, float targetVel, float dt) {
     j.angle = constrain(j.angle, j.minA, j.maxA);
     j.vel = 0;
   }
+  j.servo.writeMicroseconds(angleToUs(j.angle));
 }
 
-float homeVel(const Joint &j, float goal) {
-  return constrain((goal - j.angle) * HOME_GAIN, -MAX_SPEED, MAX_SPEED);
-}
-
-void selectServo(int s) {
-  selectedServo = s;
+void selectJoint(int i) {
+  selected = i;
   homing = false;
   Serial.print("Selected: ");
-  Serial.println(s == 1 ? "1 - base" : s == 2 ? "2 - arm" : "3 - gripper");
+  Serial.print(i + 1);
+  Serial.print(" - ");
+  Serial.println(joints[i].name);
 }
 
 bool joyButtonPressed() {
   static bool last = HIGH;
-  static unsigned long changed = 0;
   static bool stable = HIGH;
-  bool level = digitalRead(joySW);
+  static unsigned long changed = 0;
+  bool level = digitalRead(PIN_JOY_SW);
   if (level != last) {
     last = level;
     changed = millis();
@@ -161,30 +162,23 @@ void setup() {
   Serial.begin(9600);
   delay(500);
 
-  pinMode(joySW, INPUT_PULLUP);
+  pinMode(PIN_JOY_SW, INPUT_PULLUP);
   analogReadResolution(12);
 
-  servo1.setPeriodHertz(50);
-  servo2.setPeriodHertz(50);
-  servo3.setPeriodHertz(50);
-  servo4.setPeriodHertz(50);
-
   // По черзі, щоб не було кидка струму від усіх серво одразу
-  servo4.attach(servoPin4, 1000, 2000);
-  servo4.writeMicroseconds(GRIP_STOP_US);
-  delay(200);
-  servo1.attach(servoPin1, 500, 2500);
-  servo1.writeMicroseconds(angleToUs(base.angle));
-  delay(300);
-  servo2.attach(servoPin2, 500, 2500);
-  servo3.attach(servoPin3, 500, 2500);
-  writeArm();
-  delay(300);
+  for (int i = 0; i < JOINTS; i++) {
+    Joint &j = joints[i];
+    j.angle = constrain(j.start, j.minA, j.maxA);
+    j.servo.setPeriodHertz(50);
+    j.servo.attach(j.pin, 500, 2500);
+    j.servo.writeMicroseconds(angleToUs(j.angle));
+    delay(300);
+  }
 
   calibrateJoystick();
 
   Serial.println("ESP32 Robot Arm Ready");
-  Serial.println("1 - base | 2 - arm | 3 - gripper | 0 - home | joystick button - next");
+  Serial.println("1 - base | 2 - shoulder | 3 - elbow | 4 - claw | 0 - home | joystick button - next");
 }
 
 // ===================================
@@ -193,15 +187,13 @@ void setup() {
 
 void loop() {
   char key = keypad.getKey();
-  if (key == '1') selectServo(1);
-  else if (key == '2') selectServo(2);
-  else if (key == '3') selectServo(3);
+  if (key >= '1' && key <= '4') selectJoint(key - '1');
   else if (key == '0') {
     homing = true;
     Serial.println("Home");
   }
 
-  if (joyButtonPressed()) selectServo(selectedServo % 3 + 1);
+  if (joyButtonPressed()) selectJoint((selected + 1) % JOINTS);
 
   static unsigned long lastTick = 0;
   unsigned long now = millis();
@@ -212,38 +204,33 @@ void loop() {
   float cmd = readJoystick();
   if (cmd != 0) homing = false;
 
-  float baseTarget = 0, armTarget = 0;
-  if (homing) {
-    baseTarget = homeVel(base, BASE_START);
-    armTarget = homeVel(arm, ARM_START);
-    if (fabsf(base.angle - BASE_START) < 0.5f && fabsf(arm.angle - ARM_START) < 0.5f) homing = false;
-  } else if (selectedServo == 1) {
-    baseTarget = cmd * MAX_SPEED;
-  } else if (selectedServo == 2) {
-    armTarget = cmd * MAX_SPEED;
+  bool atHome = true;
+  for (int i = 0; i < JOINTS; i++) {
+    Joint &j = joints[i];
+    float targetVel = 0;
+    if (homing) {
+      targetVel = constrain((j.start - j.angle) * HOME_GAIN, -j.maxSpeed, j.maxSpeed);
+      if (fabsf(j.start - j.angle) > 0.5f) atHome = false;
+    } else if (i == selected) {
+      targetVel = cmd * j.maxSpeed;
+    }
+    moveJoint(j, targetVel, dt);
   }
-
-  moveJoint(base, baseTarget, dt);
-  moveJoint(arm, armTarget, dt);
-  writeArm();
-
-  float gripTarget = GRIP_STOP_US;
-  if (selectedServo == 3 && !homing) gripTarget += cmd * GRIP_MAX_DELTA;
-  gripUs = approach(gripUs, gripTarget, GRIP_RAMP * dt);
-  servo4.writeMicroseconds((int)(gripUs + 0.5f));
+  if (homing && atHome) homing = false;
 
   static unsigned long lastPrint = 0;
   if (now - lastPrint >= 500) {
     lastPrint = now;
     Serial.print("Sel: ");
-    Serial.print(selectedServo);
+    Serial.print(selected + 1);
     Serial.print(" | Joy: ");
     Serial.print(cmd, 2);
-    Serial.print(" | Base: ");
-    Serial.print(base.angle, 1);
-    Serial.print(" | Arm: ");
-    Serial.print(arm.angle, 1);
-    Serial.print(" | Grip us: ");
-    Serial.println((int)gripUs);
+    for (int i = 0; i < JOINTS; i++) {
+      Serial.print(" | ");
+      Serial.print(joints[i].name);
+      Serial.print(": ");
+      Serial.print(joints[i].angle, 0);
+    }
+    Serial.println();
   }
 }
